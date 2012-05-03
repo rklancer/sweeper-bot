@@ -70,4 +70,9 @@ void setup() {
 }
 
 void loop() {
+  digitalWrite(brushRelayPin, HIGH);
+  delay(1000);
+  digitalWrite(brushRelayPin, LOW);
+  delay(1000);
 }
+
