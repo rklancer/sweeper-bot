@@ -87,17 +87,16 @@ void loop() {
   int pin = motorControllerS2Pin;
 
   for (i = 0; i <= 5; i++){
-    analogWrite(pin, i*25);
+    analogWrite(pin, i*50);
     analogWrite(LEDPin, i*25);
     delay(1000);
   }
-
-  analogWrite(pin, 0);
   blink(3000);
 
   for (i = 5; i >= 0; i--){
-    analogWrite(pin, i*25);
+    analogWrite(pin, i*50);
     analogWrite(LEDPin, i*25);
     delay(1000);
   }
+  blink(3000);
 }
