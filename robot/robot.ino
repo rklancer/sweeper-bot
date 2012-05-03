@@ -23,6 +23,8 @@ const int SPISelectBPin = 44;
 const int SPISelectCPin = 46;
 const int SPISelectDPin = 48;
 
+const int LEDPin = 13;
+
 // PWM pins
 const int motorControllerS1Pin = 2;
 const int motorControllerS2Pin = 3;
@@ -50,7 +52,8 @@ void setupOutputPins() {
     SPISelectAPin,
     SPISelectBPin,
     SPISelectCPin,
-    SPISelectDPin
+    SPISelectDPin,
+    LEDPin
   };
   int i;
   int len;
@@ -62,17 +65,39 @@ void setupOutputPins() {
   }
 }
 
+void blink(int t) {
+  const int HALF_PERIOD = 100;
+  int n;
+  int i;
+
+  n = t / HALF_PERIOD;
+  for (i = 0; i < n; i++) {
+    analogWrite(LEDPin, 255 * (i % 2));
+    delay(HALF_PERIOD);
+  }
+}
+
 void setup() {
   setupOutputPins();
   digitalWrite(eStopPin, HIGH);
-  pinMode(13, OUTPUT);
-  analogWrite(13, 255);
 }
 
 void loop() {
-  digitalWrite(brushRelayPin, HIGH);
-  delay(3000);
-  digitalWrite(brushRelayPin, LOW);
-  delay(1000);
-}
+  int i;
+  int pin = motorControllerS2Pin;
 
+  for (i = 0; i <= 5; i++){
+    analogWrite(pin, i*25);
+    analogWrite(LEDPin, i*25);
+    delay(1000);
+  }
+
+  analogWrite(pin, 0);
+  blink(3000);
+
+  for (i = 5; i >= 0; i--){
+    analogWrite(pin, i*25);
+    analogWrite(LEDPin, i*25);
+    delay(1000);
+  }
+}
