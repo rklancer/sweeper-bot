@@ -1,9 +1,9 @@
-/* Robot test program 
+/* Robot test program
 
    Artisan's Asylum sweeper bot team
    5-2-2012
 
-   Richard Klancer 
+   Richard Klancer
    rpk@pobox.com
 */
 
@@ -30,7 +30,7 @@ const int motorControllerS2Pin = 3;
 //
 // SPI stuff. See http://arduino.cc/en/Reference/SPI
 // SPI library expects these pins to work as follows:
-// 
+//
 
 // Master In Slave Out
 const int MISOPin = 50;
@@ -59,12 +59,12 @@ void setupOutputPins() {
 
   for (i = 0; i < len; i++) {
     pinMode(outputPins[i], OUTPUT);
-  }  
+  }
 }
 
 void setup() {
   setupOutputPins();
-  digitalWrite(eStopPin, HIGH); 
+  digitalWrite(eStopPin, HIGH);
   pinMode(13, OUTPUT);
   analogWrite(13, 255);
 }
