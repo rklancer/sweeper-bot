@@ -8,6 +8,7 @@
 */
 
 #include <SPI.h>
+#include "motors.h"
 
 //
 // Pins we define ... these can change if depending how we want to wire things
@@ -27,8 +28,8 @@ const int LEDPin = 13;
 
 // motor control
 
-const byte MOTOR1 = 0;
-const byte MOTOR2 = 0x80;
+const byte MOTOR1_SELECT = 0;
+const byte MOTOR2_SELECT = 0x80;
 
 const byte REVERSE = 0x01;
 const byte STOP = 0x40;
@@ -36,7 +37,6 @@ const byte FORWARD = 0x7F;
 const float RANGE = (float)(STOP - REVERSE);
 
 float motorSetting[] = {0.0, 0.0};
-
 
 //
 // SPI stuff. See http://arduino.cc/en/Reference/SPI
@@ -103,16 +103,17 @@ void blink(int t) {
     speed: -1.0 for full reverse; 0 for stop; 1.0 for full forward
     Values outside this range are clamped to the range [-1.0, 1.0]
 */
-void motor(int motor, float speed) {
+void motor(Motor m, float speed) {
   byte motorSelect;
   byte val;
+  char buf[25];
 
   if (speed > 1.0) speed = 1.0;
   if (speed < -1.0) speed = -1.0;
 
-  motorSetting[motor-1] = speed;
+  motorSetting[(int)m] = speed;
 
-  motorSelect = motor == 1 ? MOTOR1 : MOTOR2;
+  motorSelect = m == MOTOR1 ? MOTOR1_SELECT : MOTOR2_SELECT;
   val = ((byte)(speed * RANGE) + STOP) | motorSelect;
   Serial1.write(val);
 }
@@ -128,18 +129,18 @@ void setup() {
 
 void loop() {
   Serial.write("Forward\n");
-  motor(2, 1.0);
+  motor(MOTOR2, 1.0);
   delay(1000);
 
   Serial.write("Stop\n");
-  motor(2, 0.0);
+  motor(MOTOR2, 0.0);
   delay(1000);
 
   Serial.write("Reverse\n");
-  motor(2, -1.0);
+  motor(MOTOR2, -1.0);
   delay(1000);
 
   Serial.write("Stop\n");
-  motor(2, 0.0);
+  motor(MOTOR2, 0.0);
   delay(1000);
 }
