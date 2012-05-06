@@ -35,6 +35,9 @@ const byte STOP = 0x40;
 const byte FORWARD = 0x7F;
 const float RANGE = (float)(STOP - REVERSE);
 
+float motorSetting[] = {0.0, 0.0};
+
+
 //
 // SPI stuff. See http://arduino.cc/en/Reference/SPI
 // SPI library expects these pins to work as follows:
@@ -101,15 +104,17 @@ void blink(int t) {
     Values outside this range are clamped to the range [-1.0, 1.0]
 */
 void motor(int motor, float speed) {
-  byte mask;
+  byte motorSelect;
   byte val;
 
   if (speed > 1.0) speed = 1.0;
   if (speed < -1.0) speed = -1.0;
 
-  mask = motor == 1 ? MOTOR1 : MOTOR2;
-  val = (byte)(speed * RANGE) + STOP;
-  Serial1.write(val | mask);
+  motorSetting[motor-1] = speed;
+
+  motorSelect = motor == 1 ? MOTOR1 : MOTOR2;
+  val = ((byte)(speed * RANGE) + STOP) | motorSelect;
+  Serial1.write(val);
 }
 
 void setup() {
