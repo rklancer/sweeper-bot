@@ -25,9 +25,15 @@ const int SPISelectDPin = 48;
 
 const int LEDPin = 13;
 
-// PWM pins
-const int motorControllerS1Pin = 2;
-const int motorControllerS2Pin = 3;
+// motor control
+
+const byte MOTOR1 = 0;
+const byte MOTOR2 = 0x80;
+
+const byte REVERSE = 0x01;
+const byte STOP = 0x40;
+const byte FORWARD = 0x7F;
+const float RANGE = (float)(STOP - REVERSE);
 
 //
 // SPI stuff. See http://arduino.cc/en/Reference/SPI
@@ -46,7 +52,6 @@ const int SSPin = 53;
 void setupOutputPins() {
   int outputPins[] = {
     SSPin,
-    eStopPin,
     brushRelayPin,
     vacuumRelayPin,
     SPISelectAPin,
@@ -65,6 +70,16 @@ void setupOutputPins() {
   }
 }
 
+/**
+  Last setup step -- turn emergency stop system off (i.e, allow system to turn on.)
+  Delays 0.1s for motor controller board, etc., to power up after relay switches
+*/
+void emergencyStopOff() {
+  pinMode(eStopPin, OUTPUT);
+  digitalWrite(eStopPin, HIGH);
+  delay(100);
+}
+
 void blink(int t) {
   const int HALF_PERIOD = 100;
   int n;
@@ -77,26 +92,42 @@ void blink(int t) {
   }
 }
 
+/**
+  Command motor 1 or 2.
+
+  Arguments:
+    motor:  1 or 2
+    speed: -1.0 for full reverse; 0 for stop; 1.0 for full forward
+    Values outside this range are clamped to the range [-1.0, 1.0]
+*/
+void motor(int motor, float speed) {
+  byte mask;
+  byte val;
+
+  if (speed > 1.0) speed = 1.0;
+  if (speed < -1.0) speed = -1.0;
+
+  mask = motor == 1 ? MOTOR1 : MOTOR2;
+  val = (byte)(speed * RANGE) + STOP;
+  Serial1.write(val | mask);
+}
+
 void setup() {
   setupOutputPins();
-  digitalWrite(eStopPin, HIGH);
+  Serial1.begin(2400);
+  emergencyStopOff();
 }
 
 void loop() {
-  int i;
-  int pin = motorControllerS2Pin;
+  motor(2, 1.0);
+  delay(1000);
 
-  for (i = 0; i <= 5; i++){
-    analogWrite(pin, i*50);
-    analogWrite(LEDPin, i*25);
-    delay(1000);
-  }
-  blink(3000);
+  motor(2, 0.0);
+  delay(1000);
 
-  for (i = 5; i >= 0; i--){
-    analogWrite(pin, i*50);
-    analogWrite(LEDPin, i*25);
-    delay(1000);
-  }
-  blink(3000);
+  motor(2, -1.0);
+  delay(1000);
+
+  motor(2, 0.0);
+  delay(1000);
 }
