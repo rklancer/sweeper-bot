@@ -121,18 +121,25 @@ void setup() {
   setupOutputPins();
   Serial1.begin(19200);
   emergencyStopOff();
+
+  Serial.begin(9600);
+  Serial.write("Program starting.\n");
 }
 
 void loop() {
+  Serial.write("Forward\n");
   motor(2, 1.0);
   delay(1000);
 
+  Serial.write("Stop\n");
   motor(2, 0.0);
   delay(1000);
 
+  Serial.write("Reverse\n");
   motor(2, -1.0);
   delay(1000);
 
+  Serial.write("Stop\n");
   motor(2, 0.0);
   delay(1000);
 }
