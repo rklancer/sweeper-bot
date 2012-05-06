@@ -114,7 +114,7 @@ void motor(int motor, float speed) {
 
 void setup() {
   setupOutputPins();
-  Serial1.begin(2400);
+  Serial1.begin(19200);
   emergencyStopOff();
 }
 
