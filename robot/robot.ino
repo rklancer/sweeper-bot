@@ -124,12 +124,12 @@ void logSPI() {
     byte rawByte3;
     byte rawByte4;
 
-    digitalWrite (SPISelectCPin, LOW);
+    digitalWrite(SPISelectCPin, LOW);
     rawByte1 = SPI.transfer(0x00);
     rawByte2 = SPI.transfer(0x00);
     rawByte3 = SPI.transfer(0x00);
     rawByte4 = SPI.transfer(0x00);
-    digitalWrite (SPISelectCPin, HIGH);
+    digitalWrite(SPISelectCPin, HIGH);
 
     Serial.print("Reading = \n");
     Serial.print(rawByte1, BIN);
@@ -194,12 +194,15 @@ void setup() {
   SPI.setDataMode(SPI_MODE3);
 
   // MCP3301 transmists most significant bit first
-  // (however, during a reading, if chip select is held low while 2 additional bytes are read
-  // they will be the same reading, LSB reading. Handy for debugging!)
+  // (Hwever, during a reading, if chip select is held low while 2 additional bytes are read
+  // they will be the same reading with the least significant bit first. Handy for debugging!)
   SPI.setBitOrder(MSBFIRST);
 
-  // make sure the
-  digitalWrite (SPISelectCPin, HIGH);
+  // Pull up the Chip Select pins on the MCP3301 current-sense A/D chips
+  digitalWrite(SPISelectAPin, HIGH);
+  digitalWrite(SPISelectBPin, HIGH);
+  digitalWrite(SPISelectCPin, HIGH);
+  digitalWrite(SPISelectDPin, HIGH);
 
   Serial1.begin(19200);
 
