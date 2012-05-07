@@ -119,64 +119,64 @@ void motor(Motor m, float speed) {
 }
 
 void logSPI() {
-    byte rawByte1;
-    byte rawByte2;
-    byte rawByte3;
-    byte rawByte4;
+  byte rawByte1;
+  byte rawByte2;
+  byte rawByte3;
+  byte rawByte4;
 
-    digitalWrite(SPISelectCPin, LOW);
-    rawByte1 = SPI.transfer(0x00);
-    rawByte2 = SPI.transfer(0x00);
-    rawByte3 = SPI.transfer(0x00);
-    rawByte4 = SPI.transfer(0x00);
-    digitalWrite(SPISelectCPin, HIGH);
+  digitalWrite(SPISelectCPin, LOW);
+  rawByte1 = SPI.transfer(0x00);
+  rawByte2 = SPI.transfer(0x00);
+  rawByte3 = SPI.transfer(0x00);
+  rawByte4 = SPI.transfer(0x00);
+  digitalWrite(SPISelectCPin, HIGH);
 
-    Serial.print("Reading = \n");
-    Serial.print(rawByte1, BIN);
-    Serial.print(" ");
-    Serial.print(rawByte2, BIN);
-    Serial.print(" ");
-    Serial.print(rawByte3, BIN);
-    Serial.print(" ");
-    Serial.print(rawByte4, BIN);
-    Serial.print("\n\n");
+  Serial.print("Reading = \n");
+  Serial.print(rawByte1, BIN);
+  Serial.print(" ");
+  Serial.print(rawByte2, BIN);
+  Serial.print(" ");
+  Serial.print(rawByte3, BIN);
+  Serial.print(" ");
+  Serial.print(rawByte4, BIN);
+  Serial.print("\n\n");
 
-    // // convert the two bytes to one int
-    // int rawInt = rawByte1 << 8;
-    // rawInt = rawInt | rawByte2;
-    // sign = rawInt & 0x1000;
+  // // convert the two bytes to one int
+  // int rawInt = rawByte1 << 8;
+  // rawInt = rawInt | rawByte2;
+  // sign = rawInt & 0x1000;
 
-    // Serial.print("rawInt= ");
-    // Serial.print(rawInt);
-    // Serial.print("  binary = ");
-    // Serial.print(rawInt, BIN);
-    // Serial.print("  value = ");
+  // Serial.print("rawInt= ");
+  // Serial.print(rawInt);
+  // Serial.print("  binary = ");
+  // Serial.print(rawInt, BIN);
+  // Serial.print("  value = ");
 
-    // if (sign) {
-    //   Serial.print ("+");
-    //   value = rawInt & 0x0FFF;
-    // }
-    // else {
-    //   Serial.print ("-");
-    //   value = 0x1000 - rawInt;
-    //   // value = !rawInt & 4095; //0x0000111111111111
-    // }
-    // Serial.print("  ");
-    // Serial.print(sign, BIN);
-    // Serial.print("  ");
-    // Serial.print(value, BIN);
-    // Serial.print(value);
-    // Serial.print("  voltage = ");
-    // if (sign) {
-    //   Serial.print("+");
-    // }
-    // else {
-    //   Serial.print("-");
-    // }
+  // if (sign) {
+  //   Serial.print ("+");
+  //   value = rawInt & 0x0FFF;
+  // }
+  // else {
+  //   Serial.print ("-");
+  //   value = 0x1000 - rawInt;
+  //   // value = !rawInt & 4095; //0x0000111111111111
+  // }
+  // Serial.print("  ");
+  // Serial.print(sign, BIN);
+  // Serial.print("  ");
+  // Serial.print(value, BIN);
+  // Serial.print(value);
+  // Serial.print("  voltage = ");
+  // if (sign) {
+  //   Serial.print("+");
+  // }
+  // else {
+  //   Serial.print("-");
+  // }
 
-    // float voltage = 2.0 - ((value / 4096.0) * 2.0);
-    // Serial.print(voltage);
-    // Serial.print("V\n");
+  // float voltage = 2.0 - ((value / 4096.0) * 2.0);
+  // Serial.print(voltage);
+  // Serial.print("V\n");
 }
 
 void setup() {
