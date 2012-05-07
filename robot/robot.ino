@@ -118,29 +118,119 @@ void motor(Motor m, float speed) {
   Serial1.write(val);
 }
 
+void logSPI() {
+    byte rawByte1;
+    byte rawByte2;
+    byte rawByte3;
+    byte rawByte4;
+
+    digitalWrite (SPISelectCPin, LOW);
+    rawByte1 = SPI.transfer(0x00);
+    rawByte2 = SPI.transfer(0x00);
+    rawByte3 = SPI.transfer(0x00);
+    rawByte4 = SPI.transfer(0x00);
+    digitalWrite (SPISelectCPin, HIGH);
+
+    Serial.print("Reading = \n");
+    Serial.print(rawByte1, BIN);
+    Serial.print(" ");
+    Serial.print(rawByte2, BIN);
+    Serial.print(" ");
+    Serial.print(rawByte3, BIN);
+    Serial.print(" ");
+    Serial.print(rawByte4, BIN);
+    Serial.print("\n\n");
+
+    // // convert the two bytes to one int
+    // int rawInt = rawByte1 << 8;
+    // rawInt = rawInt | rawByte2;
+    // sign = rawInt & 0x1000;
+
+    // Serial.print("rawInt= ");
+    // Serial.print(rawInt);
+    // Serial.print("  binary = ");
+    // Serial.print(rawInt, BIN);
+    // Serial.print("  value = ");
+
+    // if (sign) {
+    //   Serial.print ("+");
+    //   value = rawInt & 0x0FFF;
+    // }
+    // else {
+    //   Serial.print ("-");
+    //   value = 0x1000 - rawInt;
+    //   // value = !rawInt & 4095; //0x0000111111111111
+    // }
+    // Serial.print("  ");
+    // Serial.print(sign, BIN);
+    // Serial.print("  ");
+    // Serial.print(value, BIN);
+    // Serial.print(value);
+    // Serial.print("  voltage = ");
+    // if (sign) {
+    //   Serial.print("+");
+    // }
+    // else {
+    //   Serial.print("-");
+    // }
+
+    // float voltage = 2.0 - ((value / 4096.0) * 2.0);
+    // Serial.print(voltage);
+    // Serial.print("V\n");
+}
+
 void setup() {
   setupOutputPins();
+
+  // start the SPI library:
+  SPI.begin();
+
+  // Arduino clock is 16 Mhz; this corresponds to 250kHz CLK on SPI bus
+  SPI.setClockDivider(SPI_CLOCK_DIV64);
+
+  // * data is transmitted by MCP3301 on falling edge
+  // * Arduino SPI clock idles high
+  // this is: CPOL=1, CPHA=1 (SPI mode 3)
+  SPI.setDataMode(SPI_MODE3);
+
+  // MCP3301 transmists most significant bit first
+  // (however, during a reading, if chip select is held low while 2 additional bytes are read
+  // they will be the same reading, LSB reading. Handy for debugging!)
+  SPI.setBitOrder(MSBFIRST);
+
+  // make sure the
+  digitalWrite (SPISelectCPin, HIGH);
+
   Serial1.begin(19200);
-  emergencyStopOff();
 
   Serial.begin(9600);
-  Serial.write("Program starting.\n");
+  Serial.print("Program starting.\n");
+
+  emergencyStopOff();
 }
 
 void loop() {
-  Serial.write("Forward\n");
+  Serial.print("Forward\n");
   motor(MOTOR2, 1.0);
-  delay(1000);
+  delay(2000);
+  logSPI();
+  delay(2000);
 
-  Serial.write("Stop\n");
+  Serial.print("Stop\n");
   motor(MOTOR2, 0.0);
-  delay(1000);
+  delay(2000);
+  logSPI();
+  delay(2000);
 
-  Serial.write("Reverse\n");
+  Serial.print("Reverse\n");
   motor(MOTOR2, -1.0);
-  delay(1000);
+  delay(2000);
+  logSPI();
+  delay(2000);
 
-  Serial.write("Stop\n");
-  motor(MOTOR2, 0.0);
-  delay(1000);
+  Serial.print("Stop\n");
+  motor(MOTOR2, 0);
+  delay(2000);
+  logSPI();
+  delay(2000);
 }
