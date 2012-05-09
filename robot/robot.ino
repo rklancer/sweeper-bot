@@ -118,28 +118,22 @@ void motor(Motor m, float speed) {
 }
 
 void logSPI() {
-  byte rawByte1;
-  byte rawByte2;
-  byte rawByte3;
-  byte rawByte4;
+  byte rawByte[6];
+  byte i;
 
   digitalWrite(SPISelectAPin, LOW);
-  rawByte1 = SPI.transfer(0x00);
-  rawByte2 = SPI.transfer(0x00);
-  rawByte3 = SPI.transfer(0x00);
-  rawByte4 = SPI.transfer(0x00);
+  for (i = 0; i < 6; i++) {
+    rawByte[i] = SPI.transfer(0x00);
+  }
   digitalWrite(SPISelectAPin, HIGH);
 
-  rawByte1 &= 0x0F;
+  rawByte[0] &= 0x0F;
 
-  Serial.print("Reading = \n");
-  Serial.print(rawByte1, BIN);
-  Serial.print(" ");
-  Serial.print(rawByte2, BIN);
-  Serial.print(" ");
-  Serial.print(rawByte3, BIN);
-  Serial.print(" ");
-  Serial.print(rawByte4, BIN);
+  Serial.print("Reading:\n");
+  for (i = 0; i < 6; i++) {
+    Serial.print(rawByte[i], BIN);
+    Serial.print(" ");
+  }
   Serial.print("\n\n");
 
   // // convert the two bytes to one int
