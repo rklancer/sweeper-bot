@@ -130,6 +130,8 @@ void logSPI() {
   rawByte4 = SPI.transfer(0x00);
   digitalWrite(SPISelectCPin, HIGH);
 
+  rawByte1 &= 0x0F;
+
   Serial.print("Reading = \n");
   Serial.print(rawByte1, BIN);
   Serial.print(" ");
