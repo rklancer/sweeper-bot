@@ -123,12 +123,12 @@ void logSPI() {
   byte rawByte3;
   byte rawByte4;
 
-  digitalWrite(SPISelectCPin, LOW);
+  digitalWrite(SPISelectAPin, LOW);
   rawByte1 = SPI.transfer(0x00);
   rawByte2 = SPI.transfer(0x00);
   rawByte3 = SPI.transfer(0x00);
   rawByte4 = SPI.transfer(0x00);
-  digitalWrite(SPISelectCPin, HIGH);
+  digitalWrite(SPISelectAPin, HIGH);
 
   rawByte1 &= 0x0F;
 
