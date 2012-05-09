@@ -119,21 +119,60 @@ void motor(Motor m, float speed) {
 
 void logSPI() {
   byte rawByte[6];
-  byte i;
+  int i;
+  int msb;
+  int lsb;
 
-  digitalWrite(SPISelectAPin, LOW);
+  unsigned int msbSignBit;
+  unsigned int msbNullBit;
+  unsigned int lsbSignBit;
+  unsigned int lsbNullBit;
+
+  digitalWrite(SPISelectCPin, LOW);
   for (i = 0; i < 6; i++) {
     rawByte[i] = SPI.transfer(0x00);
   }
-  digitalWrite(SPISelectAPin, HIGH);
-
-  rawByte[0] &= 0x0F;
+  digitalWrite(SPISelectCPin, HIGH);
 
   Serial.print("Reading:\n");
   for (i = 0; i < 6; i++) {
     Serial.print(rawByte[i], BIN);
     Serial.print(" ");
   }
+  Serial.print("\n");
+
+  msbNullBit = (rawByte[0] & 0x20) >> 5;
+  msbSignBit = (rawByte[0] & 0x10) >> 4;
+  lsbSignBit = (rawByte[3] & 0x10) >> 4;
+  lsbNullBit = (rawByte[3] & 0x08) >> 3;
+
+  msb = (unsigned int)rawByte[1] + ((unsigned int)(rawByte[0] & 0x03) << 8);
+
+  // the zero bit of the LSB reading is not repeated
+  lsb = rawByte[1] & 0x01;
+
+  for (i = 1; i <= 8; i++) {
+    lsb += ((rawByte[2] >> (8 - i)) & 0x01) << i;
+  }
+  for (i = 9; i <= 11; i++) {
+    lsb += ((rawByte[3] >> (16 - i)) & 0x01) << i;
+  }
+
+  if (msbSignBit) {
+    msb |= 0xF000;
+  }
+  if (lsbSignBit) {
+    lsb |= 0xF000;
+  }
+
+  Serial.print(msbNullBit, DEC);
+  Serial.print(lsbNullBit, DEC);
+  Serial.print(msbSignBit, DEC);
+  Serial.print(lsbSignBit, DEC);
+  Serial.print("\n");
+  Serial.print(msb, DEC);
+  Serial.print(" ?= ");
+  Serial.print(lsb, DEC);
   Serial.print("\n\n");
 
   // // convert the two bytes to one int
