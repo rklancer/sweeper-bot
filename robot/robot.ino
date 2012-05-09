@@ -106,7 +106,6 @@ void blink(int t) {
 void motor(Motor m, float speed) {
   byte motorSelect;
   byte val;
-  char buf[25];
 
   if (speed > 1.0) speed = 1.0;
   if (speed < -1.0) speed = -1.0;
