@@ -122,6 +122,8 @@ void logSPI() {
   int i;
   int msb;
   int lsb;
+  unsigned int lsbReversed;
+  unsigned int lsbBit;
 
   unsigned int msbSignBit;
   unsigned int msbNullBit;
@@ -146,16 +148,17 @@ void logSPI() {
   lsbSignBit = (rawByte[3] & 0x10) >> 4;
   lsbNullBit = (rawByte[3] & 0x08) >> 3;
 
-  msb = (unsigned int)rawByte[1] + ((unsigned int)(rawByte[0] & 0x03) << 8);
+  msb = ((int)(rawByte[0] & 0x0F) << 8) | (int)rawByte[1];
+
+  lsbReversed = ((unsigned int)rawByte[2] << 8) | (unsigned int)(rawByte[3] & 0xE0);
 
   // the zero bit of the LSB reading is not repeated
-  lsb = rawByte[1] & 0x01;
+  lsb = ((unsigned int)rawByte[1] & 0x01);
 
-  for (i = 1; i <= 8; i++) {
-    lsb += ((rawByte[2] >> (8 - i)) & 0x01) << i;
-  }
-  for (i = 9; i <= 11; i++) {
-    lsb += ((rawByte[3] >> (16 - i)) & 0x01) << i;
+  for (i = 1; i <= 11; i++) {
+    lsbBit = (lsbReversed >> (16 - i));
+    lsbBit &= 0x01;
+    lsb |= (lsbBit << i);
   }
 
   if (msbSignBit) {
@@ -169,6 +172,7 @@ void logSPI() {
   Serial.print(lsbNullBit, DEC);
   Serial.print(msbSignBit, DEC);
   Serial.print(lsbSignBit, DEC);
+
   Serial.print("\n");
   Serial.print(msb, DEC);
   Serial.print(" ?= ");
