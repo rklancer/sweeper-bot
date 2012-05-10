@@ -120,7 +120,7 @@ void motor(Motor m, float speed) {
   Serial1.write(val);
 }
 
-void logSPI() {
+void logSPI(int pin) {
   byte rawByte[6];
   int i;
 
@@ -138,11 +138,11 @@ void logSPI() {
   float voltage;
   float current;
 
-  digitalWrite(SPISelectCPin, LOW);
+  digitalWrite(pin, LOW);
   for (i = 0; i < 6; i++) {
     rawByte[i] = SPI.transfer(0x00);
   }
-  digitalWrite(SPISelectCPin, HIGH);
+  digitalWrite(pin, HIGH);
 
   Serial.print("----\n");
   for (i = 0; i < 6; i++) {
@@ -249,27 +249,15 @@ void setup() {
 }
 
 void loop() {
-  Serial.print("Forward\n");
-  motor(MOTOR2, 1.0);
+  Serial.print("Brush motor on\n");
+  digitalWrite(brushRelayPin, HIGH);
   delay(2000);
-  logSPI();
-  delay(2000);
-
-  Serial.print("Stop\n");
-  motor(MOTOR2, 0.0);
-  delay(2000);
-  logSPI();
+  logSPI(SPISelectCPin);
   delay(2000);
 
-  Serial.print("Reverse\n");
-  motor(MOTOR2, -1.0);
+  Serial.print("Brush motor off\n");
+  digitalWrite(brushRelayPin, LOW);
   delay(2000);
-  logSPI();
-  delay(2000);
-
-  Serial.print("Stop\n");
-  motor(MOTOR2, 0);
-  delay(2000);
-  logSPI();
+  logSPI(SPISelectCPin);
   delay(2000);
 }
