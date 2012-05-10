@@ -52,6 +52,9 @@ const int MOSIPin = 51;
 // Slave Select (must be careful to set to output mode if not using)
 const int SSPin = 53;
 
+
+const float CURRENT_SENSOR_RESISTANCE = 0.05;
+
 void setupOutputPins() {
   int outputPins[] = {
     SSPin,
@@ -120,6 +123,7 @@ void motor(Motor m, float speed) {
 void logSPI() {
   byte rawByte[6];
   int i;
+
   int msb;
   int lsb;
   unsigned int lsbReversed;
@@ -130,13 +134,17 @@ void logSPI() {
   unsigned int lsbSignBit;
   unsigned int lsbNullBit;
 
+  float reading;
+  float voltage;
+  float current;
+
   digitalWrite(SPISelectCPin, LOW);
   for (i = 0; i < 6; i++) {
     rawByte[i] = SPI.transfer(0x00);
   }
   digitalWrite(SPISelectCPin, HIGH);
 
-  Serial.print("Reading:\n");
+  Serial.print("----\n");
   for (i = 0; i < 6; i++) {
     Serial.print(rawByte[i], BIN);
     Serial.print(" ");
@@ -147,6 +155,12 @@ void logSPI() {
   msbSignBit = (rawByte[0] & 0x10) >> 4;
   lsbSignBit = (rawByte[3] & 0x10) >> 4;
   lsbNullBit = (rawByte[3] & 0x08) >> 3;
+
+  if (msbNullBit|| lsbNullBit) {
+    Serial.print("null bits aren't null!\n");
+    Serial.print("----\n");
+    return;
+  }
 
   msb = ((int)(rawByte[0] & 0x0F) << 8) | (int)rawByte[1];
 
@@ -168,53 +182,37 @@ void logSPI() {
     lsb |= 0xF000;
   }
 
-  Serial.print(msbNullBit, DEC);
-  Serial.print(lsbNullBit, DEC);
-  Serial.print(msbSignBit, DEC);
-  Serial.print(lsbSignBit, DEC);
+  if (msb == 4095 || msb == -4096) {
+    Serial.print("OVERFLOW\n");
+  }
+  else if (msb == lsb) {
+    reading = (float)msb;
 
-  Serial.print("\n");
-  Serial.print(msb, DEC);
-  Serial.print(" ?= ");
-  Serial.print(lsb, DEC);
-  Serial.print("\n\n");
+    voltage = reading / 4096.0 * 2.0;
+    current = voltage / CURRENT_SENSOR_RESISTANCE;
 
-  // // convert the two bytes to one int
-  // int rawInt = rawByte1 << 8;
-  // rawInt = rawInt | rawByte2;
-  // sign = rawInt & 0x1000;
+    Serial.print("voltage (V): ");
+    Serial.print(voltage, 4);
+    Serial.print("\n");
+    Serial.print("current (A): ");
+    Serial.print(current, 2);
+    Serial.print("\n\n");
+  }
+  else {
+    Serial.print("msb reading doesn't match lsb reading\n");
+    Serial.print(msbNullBit, DEC);
+    Serial.print(lsbNullBit, DEC);
+    Serial.print(msbSignBit, DEC);
+    Serial.print(lsbSignBit, DEC);
 
-  // Serial.print("rawInt= ");
-  // Serial.print(rawInt);
-  // Serial.print("  binary = ");
-  // Serial.print(rawInt, BIN);
-  // Serial.print("  value = ");
+    Serial.print("\n");
+    Serial.print(msb, DEC);
+    Serial.print(" ?= ");
+    Serial.print(lsb, DEC);
+    Serial.print("\n\n");
+  }
 
-  // if (sign) {
-  //   Serial.print ("+");
-  //   value = rawInt & 0x0FFF;
-  // }
-  // else {
-  //   Serial.print ("-");
-  //   value = 0x1000 - rawInt;
-  //   // value = !rawInt & 4095; //0x0000111111111111
-  // }
-  // Serial.print("  ");
-  // Serial.print(sign, BIN);
-  // Serial.print("  ");
-  // Serial.print(value, BIN);
-  // Serial.print(value);
-  // Serial.print("  voltage = ");
-  // if (sign) {
-  //   Serial.print("+");
-  // }
-  // else {
-  //   Serial.print("-");
-  // }
-
-  // float voltage = 2.0 - ((value / 4096.0) * 2.0);
-  // Serial.print(voltage);
-  // Serial.print("V\n");
+  Serial.print("----\n");
 }
 
 void setup() {
